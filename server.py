@@ -1,12 +1,12 @@
-#!C:\Program Files (x86)\Python36-32\python.exe
+#!C:\Users\Stepan\AppData\Local\Programs\Python\Python37-32\python.exe
 # -*- coding: utf-8 -*-
 import cgi
 import codecs
 import sqlite3
 import html
 import json
-
 import sys
+
 
 def getLabels():
     cursor.execute("SELECT * FROM labels")
@@ -24,19 +24,34 @@ def getLabels():
             s += json.dumps(data) + ','
 
         i = i + 1
-    print('{ "users": [' + s + "]}")
+    print('{ "labels": [' + s + "]}")
 
-def executeRequest(self, request):
+
+def addLabels():
+    cursor.execute("INSERT INTO labels (coordinates, description, type) VALUES (?,?,?)", (coordinates, description, type))
+    conn.commit()
+
+
+def executeRequest(request):
     if request == "getLabels":
-        self.getLabels()
+        getLabels()
+    if request == "addLabels":
+        if coordinates != "" and description != "" and type != "":
+            addLabels()
+
 
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 
 form = cgi.FieldStorage()
 
-
 request = form.getfirst("REQUEST","")
+coordinates = form.getfirst("COORDINATES","")
+description = form.getfirst("DESCRIPTION","")
+type = form.getfirst("TYPE","")
 request = html.escape(request)
+coordinates = html.escape(coordinates)
+description = html.escape(description)
+type = html.escape(type)
 
 print("Content-Type: application/json\n")
 
